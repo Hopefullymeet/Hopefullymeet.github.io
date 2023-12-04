@@ -3,8 +3,8 @@ name: Deploy Hexo Site
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # 假设您的源代码在 'main' 分支
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   build-and-deploy:
@@ -19,16 +19,21 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Install Hexo
-      run: |
-        npm install -g hexo-cli
-        npm install
+    - name: Install Hexo CLI
+      run: npm install -g hexo-cli
 
     - name: Generate Static Files
-      run: hexo generate
+      run: |
+        hexo init hexo-temp
+        cp -r source hexo-temp/source
+        cp -r themes hexo-temp/themes
+        cp _config.yml hexo-temp/_config.yml
+        cd hexo-temp
+        npm install
+        hexo generate
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public
+        publish_dir: ./hexo-temp/public
