@@ -3,8 +3,8 @@ name: Deploy Hexo Site
 on:
   push:
     branches:
-      - main  # 假设您的源文件在 'main' 分支上
-  workflow_dispatch:  # 允许手动触发工作流程
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -19,25 +19,16 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Cache Dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-
-    - name: Install Dependencies
-      run: npm install
+    - name: Install Hexo
+      run: |
+        npm install -g hexo-cli
+        npm install
 
     - name: Generate Static Files
-      run: npx hexo generate
+      run: hexo generate
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./public
-        repository: Hopefullymeet/Hopefullymeet.github.io
-        branch: master  # 部署到 'master' 分支
